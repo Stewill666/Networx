@@ -52,6 +52,7 @@ namespace Networx
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
+            // Checks for empty fields
             if (checkInputs() == true)
             {
                 if (sqlCon.State == ConnectionState.Closed)
