@@ -39,7 +39,29 @@ namespace Networx
         {
             Clear();
         }
-      
+        protected void btnUP_Click(object sender, EventArgs e)
+        {
+            if (checkInputs() == true)
+            {
+                if (sqlCon.State == ConnectionState.Closed)
+                    sqlCon.Open();
+            
+                SqlCommand sqlCmd = new SqlCommand("UPDATE Contact SET Name=@Name,Mobile=@Mobile,Address=@Address WHERE ContactID = @ID", sqlCon);
+                sqlCmd.Parameters.AddWithValue("@ID", txtID.InnerText);
+                sqlCmd.Parameters.AddWithValue("@Name", txtName.Text.Trim());
+                sqlCmd.Parameters.AddWithValue("@Mobile", txtMobile.Text.Trim());
+                sqlCmd.Parameters.AddWithValue("@Address", txtAddress.Text.Trim());
+                sqlCmd.ExecuteNonQuery();
+                sqlCon.Close();
+                
+                Clear();
+                FillGridView();
+                lblSuccessMessage.Text = "Updated Successfully";
+            } else
+            {
+                Page.ClientScript.RegisterStartupScript(this.GetType(), "Scripts", "<script>alert('Empty Field');</script>");
+            }
+        }
 
         public void Clear()
         {
@@ -51,27 +73,27 @@ namespace Networx
         }
 
         protected void btnSave_Click(object sender, EventArgs e)
-        {
+        
+       {
             // Checks for empty fields
             if (checkInputs() == true)
             {
                 if (sqlCon.State == ConnectionState.Closed)
                     sqlCon.Open();
-                SqlCommand sqlCmd = new SqlCommand("ContactCreateOrUpdate", sqlCon);
-                sqlCmd.CommandType = CommandType.StoredProcedure;
-                sqlCmd.Parameters.AddWithValue("@ContactID", (hfContactID.Value == "" ? 0 : Convert.ToInt32(hfContactID.Value)));
-                sqlCmd.Parameters.AddWithValue("@Name", txtName.Text.Trim());
-                sqlCmd.Parameters.AddWithValue("@Mobile", txtMobile.Text.Trim());
-                sqlCmd.Parameters.AddWithValue("@Address", txtAddress.Text.Trim());
-                sqlCmd.ExecuteNonQuery();
-                sqlCon.Close();
+               
+                    SqlCommand sqlCmd = new SqlCommand("INSERT INTO Contact (Name,Mobile,Address) VALUES (@Name,@Mobile,@Address)", sqlCon);
+                    sqlCmd.Parameters.AddWithValue("@ContactID", (hfContactID.Value == "" ? 0 : Convert.ToInt32(hfContactID.Value)));
+                    sqlCmd.Parameters.AddWithValue("@Name", txtName.Text.Trim());
+                    sqlCmd.Parameters.AddWithValue("@Mobile", txtMobile.Text.Trim());
+                    sqlCmd.Parameters.AddWithValue("@Address", txtAddress.Text.Trim());
+                    sqlCmd.ExecuteNonQuery();
+                    sqlCon.Close();
+               
                 string contactID = hfContactID.Value;
+                    
                 Clear();
-                if (contactID == "")
-                    lblSuccessMessage.Text = "Saved Successfully";
-                else
-                    lblSuccessMessage.Text = "Updated Successfully";
                 FillGridView();
+                lblSuccessMessage.Text = "Saved Successfully";
             }
             else
 
@@ -84,8 +106,8 @@ namespace Networx
         {
             if (sqlCon.State == ConnectionState.Closed)
                 sqlCon.Open();
-            SqlDataAdapter sqlDa = new SqlDataAdapter("ContactViewAll", sqlCon);
-            sqlDa.SelectCommand.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter sqlDa = new SqlDataAdapter("SELECT * FROM Contact", sqlCon);
+            
             DataTable dtbl = new DataTable();
             sqlDa.Fill(dtbl);
             sqlCon.Close();
@@ -99,17 +121,18 @@ namespace Networx
             int contactID = Convert.ToInt32((sender as LinkButton).CommandArgument);
             if (sqlCon.State == ConnectionState.Closed)
                 sqlCon.Open();
-            SqlDataAdapter sqlDa = new SqlDataAdapter("ContactViewByID", sqlCon);
-            sqlDa.SelectCommand.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter sqlDa = new SqlDataAdapter("SELECT * FROM Contact WHERE ContactID = @ContactID", sqlCon);
+            
             sqlDa.SelectCommand.Parameters.AddWithValue("@ContactID", contactID);
             DataTable dtbl = new DataTable();
             sqlDa.Fill(dtbl);
             sqlCon.Close();
             hfContactID.Value = contactID.ToString();
+            txtID.InnerText = dtbl.Rows[0]["ContactID"].ToString();
             txtName.Text = dtbl.Rows[0]["Name"].ToString();
             txtMobile.Text = dtbl.Rows[0]["Mobile"].ToString();
             txtAddress.Text = dtbl.Rows[0]["Address"].ToString();
-            btnSave.Text = "Update";
+            
             btnDelete.Enabled = true;
         }
 
@@ -119,9 +142,9 @@ namespace Networx
 
             if (sqlCon.State == ConnectionState.Closed)
                 sqlCon.Open();
-            SqlCommand sqlCmd = new SqlCommand("ContactDeleteByID", sqlCon);
-            sqlCmd.CommandType = CommandType.StoredProcedure;
-            sqlCmd.Parameters.AddWithValue("@ContactID", Convert.ToInt32(hfContactID.Value));
+            SqlCommand sqlCmd = new SqlCommand("DELETE FROM Contact WHERE ContactID = @ContactID ", sqlCon);
+            
+            sqlCmd.Parameters.AddWithValue("@ContactID", txtID.InnerText);
             sqlCmd.ExecuteNonQuery();
             sqlCon.Close();
             Clear();
