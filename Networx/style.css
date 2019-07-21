@@ -14,9 +14,10 @@
         width: 100%;
         height: 100%;
         position: absolute;
-        top: 0px;
         transition: all ease-in-out 500ms;
         -webkit-transition: all ease-in-out 500ms;
+        -moz-transition: all ease-in-out 500ms;
+        -o-transition: all ease-in-out 500ms;
     }
 
 .main-banner #imgban3 {
