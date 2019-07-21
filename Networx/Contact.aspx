@@ -20,7 +20,7 @@
             document.forms[0].appendChild(confirm_value);
         }
     </script>
-    <script>
+    <script type = "text/javascript">
         function ConfirmSubmit() {
             var confirm_value = document.createElement("INPUT");
             confirm_value.type = "hidden";
@@ -35,7 +35,7 @@
 
     </script>
 
-    <script>
+    <script type = "text/javascript">
         var bannerStatus = 1;
         var bannerTimer = 4000;
 
