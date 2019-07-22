@@ -42,7 +42,7 @@
         window.onload = function () {
             bannerloop();
         }
-        var startBannerLoop = setInterval(function(){
+        var startBannerLoop = setInterval(function(){ 
             bannerloop();
         }, bannerTimer);
         
